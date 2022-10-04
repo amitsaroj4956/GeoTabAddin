@@ -1,0 +1,18 @@
+{
+  "name": "Driver Score Card",
+  "items": [
+    {
+      "icon": "https://app.geotab.com/addins/geotab/eld-support/1.2.1/styles/logo.png",
+      "path": "DriveAppLink/",
+      "menuName": {
+        "en": "Driver Score Card"
+      },
+      "url": "driver_safety_score_card.html"
+    }
+  ],
+  "supportEmail": "incharlottenow@gmail.com",
+  "signature": "incharlottenow",
+  "version": "1.0",
+  "key": "incharlottenow@gmail.com",
+  "isSigned": true
+}

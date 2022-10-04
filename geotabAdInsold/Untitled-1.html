@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Driver Safety Score Card</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" />
+  <style>
+    body {
+      background-color: #ffffffff;
+    }
+
+    div#custom_report-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      vertical-align: middle;
+      height: 100vh;
+    }
+
+    .menu-list {
+      display: flex;
+      flex-wrap: nowrap;
+      flex-direction: row;
+      justify-content: space-between;
+    }
+
+    div#driver_safety_score_card {
+      display: flex;
+      flex-direction: column;
+      flex-wrap: nowrap;
+      justify-content: space-between;
+      padding: 0 10px;
+      height: 90vh;
+      align-items: stretch;
+    }
+
+    .center-menu {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-wrap: nowrap;
+    }
+
+    .center-menu h2 {
+      margin: 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <div>
+    <div id="driver_safety_score_card" class="panel">
+      <div id="my_score"></div>
+      <div class="top_score_div">
+        <table id="top_score" class="table">
+          <tr>
+            <th>Username or Unit #</th>
+            <th>Score</th>
+          </tr>
+          <tbody id="top_score_tbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <script>
+      var currentUser = localStorage.getItem("geotabDrive_@store_users");
+      var Loginusername = localStorage.getItem("geotabDrive_@driver");
+      console.log("currentUser", currentUser);
+      console.log("username", Loginusername);
+      var driverDiv = document.getElementById("driver_safety_score_card");
+      var myScoreDiv = document.getElementById("my_score");
+      var topScoreDiv = document.getElementById("top_score_tbody");
+      var Top_Score_List = "";
+      console.log(Top_Score_List, "first");
+      var bodydata = { username: Loginusername, };
+      async function getapi() {
+        await fetch("https://geotabreports.com/scheduler/total-score/", { method: "POST", body: JSON.stringify(bodydata), headers: { "Content-type": "application/json; charset=UTF-8", }, }).then((response) => response.json()).then((data) => {
+          console.log("Top Score data", data);
+
+          setTimeout(function () {
+            if (data.length == 11) {
+              console.log(`My Score is ${data[0]["TotalScore"]}`);
+              myScoreDiv.innerHTML = `<table class="table"><tr><th>My Score </th><td>${data[0]["TotalScore"]}</td></tr></table>`;
+              data.slice(1).forEach((element) => {
+                element["UserName"];
+                var top_score = `<tr><td>${element["UserName"]}</td><td>${element["TotalScore"]}</td></tr>`;
+                Top_Score_List += top_score;
+                console.log(Top_Score_List, "loop");
+              });
+              console.log(Top_Score_List, "end loop");
+              topScoreDiv.innerHTML = Top_Score_List;
+            }
+            else {
+              myScoreDiv.innerHTML = `<table class="table"><tr><th>My Score </th></tr><tr><td>0</td></tr></table>`;
+              data.forEach((element) => {
+
+                var top_score = ` <tr><td>${element["UserName"]}</td><td>${element["TotalScore"]}</td></tr>`;
+                Top_Score_List += top_score;
+              });
+              topScoreDiv.insertAdjacentHTML('beforeend', Top_Score_List);
+            }
+          }, 3000);
+        });
+      }
+      getapi();
+    </script>
+  </div>
+</body>
+
+</html>

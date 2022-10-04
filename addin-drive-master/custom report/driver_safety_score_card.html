@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Driver Safety Score Card</title>
+  <link rel="stylesheet" type="text/css" href="./custom_report.css" />
+
+</head>
+
+<body>
+  <div id="driver_safety_score_card" class="panel"></div>
+</body>
+<script>
+  var currentUser = localStorage.getItem("geotabDrive_@store_users");
+  var Loginusername = localStorage.getItem("geotabDrive_@driver");
+
+  console.log("currentUser", currentUser);
+  console.log("username", Loginusername);
+
+  var driverDiv = document.getElementById("driver_safety_score_card");
+
+  let bodydata = {
+    username: Loginusername,
+  };
+
+  fetch("http://geotab1.arivani.com/scheduler/total-score/", {
+    method: "POST",
+    body: JSON.stringify(bodydata),
+    headers: {
+      "Content-type": "application/json; charset=UTF-8",
+    },
+  }).then((response) => response.json()).then((data) => driverDiv.innerHTML = `
+      <div class="menu-list">
+         <p>${data.Topper}</p>
+         <p>${data.TopperScore}</p>
+      </div>
+      <div class="center-menu">
+         <h2>${data.UserName}</h2>
+         <h2>${data.UserScore}</h2>
+      </div>
+      <div class="menu-list">
+         <p>${data.LowestUser}</p>
+         <p>${data.LowestScoreUser}</p>
+      </div>`).catch((err) => console.log(err));
+</script>
+
+</html>

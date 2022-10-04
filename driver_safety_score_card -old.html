@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Driver Safety Score Card</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" />
+
+</head>
+
+<body>
+  <div id="driver_safety_score_card" style="
+         background-image: url(https://geotabreports.com/static/images/scorebg.jfif);
+         background-repeat: no-repeat;
+         background-size: 100% 100%;
+         height: 100vh;
+         align-items: center;
+         display: flex;
+         justify-content: center;
+         flex-direction: column;
+         ">
+
+    <div class="text-center">
+      <div id="my_score">
+        <div class="spinner-border" role="status" id="loader" style="width: 5em; height: 5em">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+    </div>
+    <!-- <div class="top_score_div">
+            <table id="top_score" class="table table-striped table-bordered table-hover">
+            <thead>
+                <tr>
+                  <th>Username or Unit #</th>
+                  <th>Score</th>
+                </tr>
+              </thead>
+              <tbody id="top_score_tbody"></tbody> 
+            </table>
+            
+            </div> -->
+  </div>
+  <script>
+
+    setTimeout(() => {
+
+      // var currentUser = localStorage.getItem("geotabDrive_@store_users");
+      var Loginusername = localStorage.getItem("geotabDrive_@driver");
+      // console.log("currentUser", currentUser);
+
+      var driverDiv = document.getElementById("driver_safety_score_card");
+      var myScoreDiv = document.getElementById("my_score");
+      var topScoreDiv = document.getElementById("top_score_tbody");
+      var Top_Score_List = "";
+      var bodydata = {
+        username: Loginusername,
+        // username: 'sochoavargas',
+      };
+      async function getapi() {
+        await fetch("https://geotabreports.com/scheduler/total-score/", {
+          method: "POST",
+          body: JSON.stringify(bodydata),
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            var element = document.getElementById("loader");
+            element.classList.remove("spinner-border");
+
+            // console.log("Top Score data", data.Data, typeof data);
+            if (data.length == 11) {
+              console.log(`My Score is ${data[0]["Data"]}`);
+              myScoreDiv.innerHTML = `<table class="table table-striped table-bordered table-hover">
+                         
+                       <tr>
+                           <th>My Score </th>
+                           <th>${data[0]["TotalScore"]}</th>
+                       </tr>
+                         
+                       </table>`;
+
+              data.slice(1).forEach((element) => {
+                console.log(element["UserName"], "===", Loginusername);
+                var top_score = `
+                       <tr class='${element["UserName"] == Loginusername
+                    ? "table-success"
+                    : `${element["UserName"]}`
+                  }'>
+                         <td>${element["UserName"]}</td>
+                         <td>${element["TotalScore"]}</td>
+                       </tr>`;
+                Top_Score_List += top_score;
+              });
+
+              topScoreDiv.innerHTML = Top_Score_List;
+            } else {
+              // const month = ["January", "February", "March", "April", "May", "June", "July", "August",
+              //   "September", "October", "November", "December"
+              // ];
+              // const d = new Date();
+              // let name = month[d.getMonth()];
+              // let year = d.getFullYear();
+              // console.log(`My Score is ${data.Data}`, name, year);
+              if (data.error) {
+                myScoreDiv.innerHTML = `
+                       <div class="my_score" style="
+                            border-radius: 100%;
+                            border: 18px solid #69a4ed;
+                            width: 347px;
+                            height: 347px;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            flex-direction: column;
+                            outline: #82baf0 solid 20px;
+                            background-color: #ffffff7a;
+                            " >
+                         
+                          <div style="
+                            color: #7000b0;
+                            font-size: 40px;
+                            font-weight: bolder;
+                            ">${data.error}
+                          </div>
+                        </div>`;
+
+                topScoreDiv.insertAdjacentHTML("beforeend", Top_Score_List);
+              } else {
+                myScoreDiv.innerHTML = `
+                       <div class="my_score" style="
+                            border-radius: 100%;
+                            border: 18px solid #69a4ed;
+                            width: 347px;
+                            height: 347px;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            flex-direction: column;
+                            outline: #82baf0 solid 20px;
+                            background-color: #ffffff7a;
+                            " >
+                          <div style="
+                            color: black;
+                            font-size: 32px;
+                            font-weight: bolder;
+                            ">YOUR SCORE
+                          </div>
+                          <div style="
+                            color: #7000b0;
+                            font-size: 60px;
+                            font-weight: bolder;
+                            ">${data.Data}
+                          </div>
+                        </div>`;
+
+                topScoreDiv.insertAdjacentHTML("beforeend", Top_Score_List);
+              }
+
+            }
+          });
+      }
+      getapi();
+    }, 4000);
+  </script>
+</body>
+
+</html>

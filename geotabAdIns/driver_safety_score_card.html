@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Driver Safety Score Card</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" />
+</head>
+
+<body>
+
+  <div id="driver_safety_score_card">
+
+    <div id="my_score"></div>
+    <div class="top_score_div">
+
+      <table id="top_score" class="table table-striped table-bordered table-hover">
+        <thead>
+          <tr>
+            <th>Username or Unit #</th>
+            <th>Score</th>
+          </tr>
+        </thead>
+        <tbody id="top_score_tbody"></tbody>
+      </table>
+      <div class="text-center">
+        <div class="spinner-border" role="status" id="loader" style="width: 5em; height: 5em;">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+
+
+    setTimeout(() => {
+
+      // var currentUser = localStorage.getItem("geotabDrive_@store_users");
+      var Loginusername = localStorage.getItem("geotabDrive_@driver");
+      // console.log("currentUser", currentUser);
+      console.log("username", Loginusername);
+      var driverDiv = document.getElementById("driver_safety_score_card");
+      var myScoreDiv = document.getElementById("my_score");
+      var topScoreDiv = document.getElementById("top_score_tbody");
+      var Top_Score_List = "";
+      var bodydata = {
+        // username: Loginusername,
+        username: 'incharlottenow@gmail.com',
+      };
+      async function getapi() {
+        await fetch("https://geotabreports.com/scheduler/total-score/", {
+          method: "POST",
+          body: JSON.stringify(bodydata),
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+
+            var element = document.getElementById("loader");
+            element.classList.remove("spinner-border");
+
+            console.log("Top Score data", data);
+            if (data.length == 11) {
+
+              console.log(`My Score is ${data[0]["TotalScore"]}`);
+              myScoreDiv.innerHTML = `<table class="table table-striped table-bordered table-hover">
+                    
+                  <tr>
+                      <th>My Score </th>
+                      <th>${data[0]["TotalScore"]}</th>
+                  </tr>
+                    
+                  </table>`;
+
+              data.slice(1).forEach((element) => {
+                console.log(element["UserName"], '===', Loginusername);
+                var top_score = `
+                  <tr class='${element["UserName"] == Loginusername ? 'table-success' : `${element["UserName"]}`}'>
+                    <td>${element["UserName"]}</td>
+                    <td>${element["TotalScore"]}</td>
+                  </tr>`;
+                Top_Score_List += top_score;
+              });
+
+              topScoreDiv.innerHTML = Top_Score_List;
+            } else {
+
+              myScoreDiv.innerHTML = `
+                  <table class="table table-striped table-bordered table-hover"><tr>
+                          <th style="width:55%">My Score </th>
+                          <th>0</th>
+                      </tr>   
+                  </table>`;
+
+              data.forEach((element) => {
+
+                var top_score = `
+                  <tr class='${element["UserName"] == Loginusername ? 'table-success' : `${element["UserName"]}`}'>
+                    <td>${element["UserName"]}</td>
+                    <td>${element["TotalScore"]}</td>
+                  </tr>`;
+                Top_Score_List += top_score;
+              });
+
+              topScoreDiv.insertAdjacentHTML('beforeend', Top_Score_List);
+            }
+
+          });
+      }
+      getapi();
+    }, 4000);
+  </script>
+</body>
+
+</html>
